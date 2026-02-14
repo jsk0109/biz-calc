@@ -494,15 +494,14 @@
 <!-- Modal -->
 <div id="resultModal" class="modal-overlay">
     <div class="modal-box">
-        <h3 style="margin:0 0 10px;">복사 완료! 🎉</h3>
+        <h3 style="margin:0 0 10px;">견적서 복사 완료! 📋</h3>
         <p style="font-size:14px; color:#666; line-height: 1.6;">
-            견적 내용이 클립보드에 저장되었습니다.<br>
-            확인 버튼을 누르면 <strong>크몽</strong>으로 이동합니다.<br><br>
-            <strong>로그인 후 [전문가에게 문의하기]</strong> 창에<br>
-            <strong>붙여넣기(Ctrl+V)</strong> 하신 뒤,<br>
-            최종 견적 확인 후 <strong>전송 버튼</strong>을 눌러주세요.
+            견적 내용이 클립보드에 <strong>복사되었습니다.</strong><br>
+            이제 <strong>크몽 서비스 페이지</strong>로 돌아가서<br>
+            <strong>[전문가에게 문의하기]</strong> 창에 내용을<br>
+            <strong>붙여넣고 전체 최종견적 내용을 확인 후 전송해주세요.</strong>
         </p>
-        <a href="https://kmong.com" target="_blank" class="modal-btn" style="display:block; text-decoration:none; box-sizing:border-box; text-align:center;" onclick="setTimeout(() => document.getElementById('resultModal').classList.remove('visible'), 300)">확인 (크몽으로 이동)</a>
+        <button class="modal-btn" onclick="document.getElementById('resultModal').classList.remove('visible')">확인 (닫기)</button>
     </div>
 </div>
 
