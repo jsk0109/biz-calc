@@ -51,7 +51,7 @@
         .tab-nav { display: flex; border-bottom: 1px solid var(--border-color); position: relative; }
         .tab-btn {
             flex: 1; padding: 15px; border: none; background: #fff;
-            font-size: 16px; font-weight: 600; color: #666;
+            font-size: 16px; font-weight: 800; color: #333; /* 글씨를 더 진하고 어둡게 변경 */
             cursor: pointer; transition: color 0.5s;
         }
         .tab-btn.active { color: var(--primary-color); background: #f8f9fa; }
@@ -501,7 +501,7 @@
             <strong>[전문가에게 문의하기]</strong> 창에 내용을<br>
             <strong>붙여넣고 전체 최종견적 내용을 확인 후 전송해주세요.</strong>
         </p>
-        <button class="modal-btn" onclick="document.getElementById('resultModal').classList.remove('visible')">확인 (닫기)</button>
+        <a href="https://kmong.com" target="_blank" class="modal-btn" style="display:block; text-decoration:none; box-sizing:border-box; text-align:center;" onclick="setTimeout(() => document.getElementById('resultModal').classList.remove('visible'), 300)">확인 (크몽으로 이동)</a>
     </div>
 </div>
 
@@ -525,7 +525,7 @@
     // ☁️ [구글 스프레드시트 연동] 엑셀로 가격 관리하기
     // 사용법: 구글 시트에 가격표를 만들고 '웹에 게시(CSV)'한 링크를 아래에 넣으세요.
     // 링크가 비어있으면 위쪽 기본 설정(PRICES)을 사용합니다. (안 쓰시면 비워두세요)
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIc2WJ5y72yLS9WzyIJzcLX-I02bRrO4IrCA-xM0n_jhGGolEA-6ubzoroB4YybiA1tkDksQxoxiIi/pub?gid=0&single=true&output=csv"; // ← 이 따옴표("") 사이에 복사한 구글시트 링크를 붙여넣고 저장(Ctrl+S)하세요!
+    const SHEET_URL = ""; // "https://docs.google.com/spreadsheets/..." (연동 해제됨: 이제 위쪽 PRICES 설정이 적용됩니다)
 
     async function loadPricesFromSheet() {
         console.log("🔄 구글 시트 연동 시도 중..."); // [확인용] 함수가 실행되는지 체크
@@ -845,6 +845,9 @@
             return;
         }
 
+        // 1. [구글 시트 전송] - 위에서 새로 만든 앱 스크립트 URL을 여기에 붙여넣으세요.
+        const scriptURL = "https://script.google.com/macros/s/AKfycbxB5_YsvzS5pxKVoDEmSQ2VBx1oyJzrXGWnn0hmm14XX6y41DkvKVVEMRfdvzMt_cJ4jQ/exec"; 
+
         const title = document.getElementById('title').value || '(미입력)';
         const category = document.getElementById('category').value || '(미선택)';
         const manuscriptType = document.getElementById('manuscriptType').value || '(미선택)';
@@ -867,7 +870,7 @@
         if(document.getElementById('optSource').checked) opts.push("📄 PDF 변환 추가");
         const optText = opts.length > 0 ? opts.join(', ') : '없음';
 
-        const text = `📋 [EPUB 제작 의뢰 및 자동견적서]
+        const clipboardText = `📋 [EPUB 제작 의뢰 및 자동견적서]
 
 1️⃣ 책 정보
 - 제목: ${title}
@@ -891,7 +894,30 @@
 
 추가 문의사항: _________________`;
 
-        navigator.clipboard.writeText(text).then(() => {
+        // 2. [시트로 보낼 데이터 정리]
+        const params = new URLSearchParams();
+        params.append('title', title);
+        params.append('category', category);
+        params.append('manuscriptType', manuscriptType);
+        params.append('status', status);
+        params.append('pages', pages);
+        params.append('style', style);
+        params.append('colors', `${mainColor} / ${subColor} / ${accentColor}`); // 색상 정보 합치기
+        params.append('ref', ref);
+        params.append('level', level);
+        params.append('optText', optText);
+        params.append('total', total);
+        params.append('duration', duration);
+
+        // 3. [시트로 데이터 전송 실행]
+        if (scriptURL && !scriptURL.includes("여기에")) {
+            fetch(scriptURL, { method: 'POST', mode: 'no-cors', body: params })
+                .then(() => console.log("✅ Ebook 견적 시트 저장 완료!"))
+                .catch(e => console.error("❌ Ebook 시트 전송 실패:", e));
+        }
+
+        // 4. [클립보드 복사 및 모달 표시]
+        navigator.clipboard.writeText(clipboardText).then(() => {
             document.getElementById('resultModal').classList.add('visible');
         }).catch(err => {
             alert('복사에 실패했습니다. 내용을 직접 복사해주세요.');
