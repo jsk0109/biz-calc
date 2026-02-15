@@ -54,7 +54,7 @@
         .tab-nav { display: flex; border-bottom: 1px solid var(--border-color); position: relative; }
         .tab-btn {
             flex: 1; padding: 15px; border: none; background: #fff;
-            font-size: 16px; font-weight: 800; color: #333; /* 글씨를 더 진하고 어둡게 변경 */
+            font-size: 16px; font-weight: 800; color: #333;
             cursor: pointer; transition: color 0.5s;
         }
         .tab-btn.active { color: var(--primary-color); background: #f8f9fa; }
@@ -83,6 +83,19 @@
             border-radius: 8px; font-size: 16px; box-sizing: border-box;
         }
         .form-textarea { resize: vertical; min-height: 80px; }
+        
+        /* [UI 개선] 입력창 포커스 및 선택 강조 스타일 */
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(94, 53, 177, 0.2);
+        }
+        .form-select.is-selected {
+            border-color: var(--primary-color);
+            background-color: #ede7f6; /* 선택 시 연한 보라색 배경 */
+            font-weight: 700; /* 글씨 굵게 */
+            box-shadow: 0 0 0 1px var(--primary-color) inset; /* 테두리 강조 */
+        }
         
         /* Quote Section */
         .quote-box {
@@ -196,6 +209,26 @@
         #counterBox.active { max-height: 500px; opacity: 1; margin-top: 15px; }
         #counterArrow { display: inline-block; transition: transform 0.3s ease; }
         #counterArrow.active { transform: rotate(180deg); }
+
+        /* 📱 모바일 최적화 (카드 형태 제거 및 여백 축소) */
+        @media (max-width: 768px) {
+            body {
+                padding: 0; /* 전체 배경 여백 제거 */
+                background-color: var(--container-bg); /* 배경색을 컨테이너와 동일하게 */
+            }
+            .container {
+                max-width: 100%;
+                border-radius: 0; /* 둥근 모서리 제거 */
+                box-shadow: none; /* 그림자 제거 (평면화) */
+                min-height: 100vh;
+            }
+            .tab-content {
+                padding: 30px 20px; /* 내부 콘텐츠 여백 축소 */
+            }
+            header {
+                padding: 25px 20px; /* 헤더 여백 축소 */
+            }
+        }
     </style>
 </head>
 <body>
@@ -346,7 +379,7 @@
                 <strong>∙ DELUXE:</strong> 이미지/박스, 팝업/인라인 각주, 정보 구조화<br>
                 <strong>∙ PREMIUM:</strong> 고급 편집, 종이책 감성, 소장 가치
             </p>
-            <select id="serviceLevel" name="service_level" class="form-select" onchange="calculateTotal()">
+            <select id="serviceLevel" name="service_level" class="form-select" onchange="calculateTotal()" autocomplete="off">
                 <option value="" selected disabled hidden>선택해주세요</option>
                 <option value="STANDARD">STANDARD</option>
                 <option value="DELUXE">DELUXE</option>
@@ -361,25 +394,28 @@
 
         <div class="form-group">
             <label class="form-label">Q. 원고 분량은 약 몇 페이지인가요? (A4 기준)</label>
-            <input type="number" id="pageCount" name="page_count" class="form-input" value="20" min="1" oninput="calculateTotal()">
+            <input type="number" id="pageCount" name="page_count" class="form-input" value="50" min="10" oninput="calculateTotal()" onblur="if(this.value<10){this.value=10;calculateTotal();}">
             <div id="pageMsg" style="font-size:14px; margin-top:6px; font-weight:600;"></div>
             <span id="pageHelpText" style="font-size:14px; color:#555; display:block; margin-top:4px;">* 텍스트 위주의 A4 원고 기준 (기본 50p, 대략 75,000자 분량 제공 / 초과 시 장당 2,000원)</span>
         </div>
         
         <!-- Character Counter Tool -->
-        <div class="form-group" style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
-            <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleCounter()">
-                <label class="form-label" style="margin:0; cursor:pointer; font-size:17px;">🧮 글자 수로 페이지를 계산해볼까요?</label>
-                <span style="font-size:16px; color:#444;"><span id="counterArrow">▼</span> 펼치기</span>
-            </div>
-            <div id="counterBox">
-                <textarea id="textSource" name="text_source" class="form-textarea" style="height:120px; margin-bottom:10px;" placeholder="여기에 원고 내용을 붙여넣으세요. (자동 계산됨)" oninput="countChars()"></textarea>
-                <div style="display:flex; gap: 15px; font-size:16px; color:#333; margin-bottom:10px; background:white; padding:10px; border-radius:6px; border:1px solid var(--border-color);">
-                    <span>공백 포함: <strong id="charCountWithSpace">0</strong>자</span>
-                    <span>예상 분량: 약 <strong id="estPages" style="color:#d32f2f;">0</strong>페이지</span>
+        <div class="form-group">
+            <label class="form-label" style="color:#5e35b1; margin-bottom:12px;">['추가금액'이나 '할인금액' 등 정확한 견적산출을 원하시면 원고를 복사 붙여넣기 하세요.]</label>
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">
+                <div style="display:flex; justify-content:space-between; align-items:center; cursor:pointer;" onclick="toggleCounter()">
+                    <span style="font-weight:700; font-size:16px; color:#333;">🧮 글자 수로 페이지 계산기 (클릭)</span>
+                    <span style="font-size:16px; color:#444;"><span id="counterArrow">▼</span> 펼치기</span>
                 </div>
-                <button type="button" id="applyBtn" onclick="applyPageCount()" style="width:100%; padding:10px; background:#555; color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; transition: all 0.3s;">👆 이 분량(페이지)으로 적용하기</button>
-                <p style="font-size:15px; color:#666; margin-top:8px;">* A4 1장당 약 1,500자(공백 포함) 기준으로 계산됩니다.</p>
+                <div id="counterBox">
+                    <textarea id="textSource" name="text_source" class="form-textarea" style="height:120px; margin-bottom:10px; margin-top:15px;" placeholder="여기에 원고 내용을 붙여넣으세요. (자동 계산됨)" oninput="countChars()"></textarea>
+                    <div style="display:flex; gap: 15px; font-size:16px; color:#333; margin-bottom:10px; background:white; padding:10px; border-radius:6px; border:1px solid var(--border-color);">
+                        <span>공백 포함: <strong id="charCountWithSpace">0</strong>자</span>
+                        <span>예상 분량: 약 <strong id="estPages" style="color:#d32f2f;">0</strong>페이지</span>
+                    </div>
+                    <button type="button" id="applyBtn" onclick="applyPageCount()" style="width:100%; padding:10px; background:#555; color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; font-weight:600; transition: all 0.3s;">👆 이 분량(페이지)으로 적용하기</button>
+                    <p style="font-size:15px; color:#666; margin-top:8px;">* A4 1장당 약 1,500자(공백 포함) 기준으로 계산됩니다.</p>
+                </div>
             </div>
         </div>
 
@@ -389,29 +425,29 @@
                 <label class="checkbox-card">
                     <div class="checkbox-row">
                         <input type="checkbox" id="optDeepEdit" name="opt_deep_edit" value="Yes" onchange="calculateTotal()">
-                        <span>✍️ 심화 교정 (문장 다듬기) (페이지당 +9,000원)</span>
+                        <span id="txtOptDeep">✍️ 심화 교정 (문장 다듬기) (페이지당 +9,000원)</span>
                     </div>
-                    <span class="checkbox-desc">비문 수정 및 문장 흐름 개선 (리라이팅 제외)</span>
+                    <span class="checkbox-desc" id="descOptDeep">비문 수정 및 문장 흐름 개선 (리라이팅 제외)</span>
                 </label>
                 <label class="checkbox-card">
                     <div class="checkbox-row">
                         <input type="checkbox" id="optCover" name="opt_cover" value="Yes" onchange="calculateTotal()">
-                        <span>🎨 표지 디자인 (심플형 기준) 추가 (+80,000원)</span>
+                        <span id="txtOptCover">🎨 표지 디자인 [심플형] 추가 (+80,000원)</span>
                     </div>
-                    <span class="checkbox-desc">상업용 폰트/이미지 활용 타이포그래피 작업</span>
+                    <span class="checkbox-desc" id="descOptCover">상업용 폰트/이미지 활용 타이포그래피 작업</span>
                 </label>
                 <label class="checkbox-card">
                     <div class="checkbox-row">
                         <input type="checkbox" id="optFast" name="opt_fast" value="Yes" onchange="calculateTotal()">
-                        <span>🚀 급행 작업 (비용 1.5배)</span>
+                        <span id="txtOptFast">🚀 급행 작업 (비용 1.5배)</span>
                     </div>
                 </label>
                 <label class="checkbox-card">
                     <div class="checkbox-row">
                         <input type="checkbox" id="optSource" name="opt_source" value="Yes" onchange="calculateTotal()">
-                        <span>📄 소장용/인쇄용 PDF 변환 (+50,000원)</span>
+                        <span id="txtOptSource">📄 소장용/인쇄용 PDF 변환 (+50,000원)</span>
                     </div>
-                    <span class="checkbox-desc">편집/교정이 완료된 최종 원고를 가독성 좋게 변환 (저작권 걱정 없는 무료 폰트 사용)</span>
+                    <span class="checkbox-desc" id="descOptSource">편집/교정이 완료된 최종 원고를 가독성 좋게 변환 (저작권 걱정 없는 무료 폰트 사용)</span>
                 </label>
             </div>
         </div>
@@ -450,7 +486,7 @@
                 <span id="basePriceDisplay">0원</span>
             </div>
             <div class="quote-row">
-                <span>페이지 추가금 (기본 50p 초과 <span id="extraPageDisplay">0</span>p)</span>
+                <span>페이지 조정 (기본 50p 기준)</span>
                 <span id="pagePriceDisplay">0원</span>
             </div>
             <div class="quote-row">
@@ -458,7 +494,7 @@
                 <span id="deepEditPriceDisplay">0원</span>
             </div>
             <div class="quote-row">
-                <span>표지 디자인</span>
+                <span>표지 디자인 [심플형]</span>
                 <span id="coverPriceDisplay">0원</span>
             </div>
             <div class="quote-row">
@@ -475,7 +511,7 @@
             </div>
             <div class="quote-row" style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed var(--border-color); color: #333;">
                 <span style="font-weight: 700; font-size: 16px;">📅 예상 작업 기간</span>
-                <span id="durationDisplay" style="font-weight: 700; color: #1a1a1a; font-size: 16px;">약 3일</span>
+                <span id="durationDisplay" style="font-weight: 700; color: #1a1a1a; font-size: 16px;">약 0일</span>
             </div>
             <p style="font-size:13px; color:#666; margin-top:10px; text-align:right;">* 실제 작업 난이도에 따라 협의 후 조정될 수 있습니다.</p>
         </div>
@@ -522,13 +558,22 @@
         },
         DEEP_EDIT_UNIT: 9000,// 심화 교정 비용 (페이지당)
         COVER_PRICE: 80000,// 표지 디자인 비용
-        PDF_PRICE: 50000   // PDF 변환 비용
+        PDF_PRICE: 50000,  // PDF 변환 비용
+
+        // 📝 [텍스트 설정] 엑셀에서 문구도 수정 가능하게 추가
+        OPT_DEEP_NAME: "✍️ 심화 교정 (문장 다듬기)",
+        OPT_DEEP_DESC: "비문 수정 및 문장 흐름 개선 (리라이팅 제외)",
+        OPT_COVER_NAME: "🎨 표지 디자인 [심플형] 추가",
+        OPT_COVER_DESC: "상업용 폰트/이미지 활용 타이포그래피 작업",
+        OPT_FAST_NAME: "🚀 급행 작업",
+        OPT_SOURCE_NAME: "📄 소장용/인쇄용 PDF 변환",
+        OPT_SOURCE_DESC: "편집/교정이 완료된 최종 원고를 가독성 좋게 변환 (저작권 걱정 없는 무료 폰트 사용)"
     };
 
     // ☁️ [구글 스프레드시트 연동] 엑셀로 가격 관리하기
     // 사용법: 구글 시트에 가격표를 만들고 '웹에 게시(CSV)'한 링크를 아래에 넣으세요.
     // 링크가 비어있으면 위쪽 기본 설정(PRICES)을 사용합니다. (안 쓰시면 비워두세요)
-    const SHEET_URL = ""; // "https://docs.google.com/spreadsheets/..." (연동 해제됨: 이제 위쪽 PRICES 설정이 적용됩니다)
+    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIc2WJ5y72yLS9WzyIJzcLX-I02bRrO4IrCA-xM0n_jhGGolEA-6ubzoroB4YybiA1tkDksQxoxiIi/pub?gid=0&single=true&output=csv"; // "https://docs.google.com/spreadsheets/..." (연동 해제됨: 이제 위쪽 PRICES 설정이 적용됩니다)
 
     async function loadPricesFromSheet() {
         console.log("🔄 구글 시트 연동 시도 중..."); // [확인용] 함수가 실행되는지 체크
@@ -539,7 +584,11 @@
             return;
         }
         try {
-            const response = await fetch(SHEET_URL);
+            // [수정] 캐시 방지 강화: URL 파라미터 + fetch 옵션 동시 적용
+            const timestamp = new Date().getTime();
+            const noCacheUrl = SHEET_URL + (SHEET_URL.includes('?') ? '&' : '?') + 't=' + timestamp;
+            
+            const response = await fetch(noCacheUrl, { cache: 'no-store' });
             const text = await response.text();
 
             // [안전장치] CSV가 아니라 일반 웹페이지 링크를 넣었는지 확인
@@ -548,26 +597,58 @@
                 return;
             }
 
-            // CSV 파싱 (A열: 항목명, B열: 가격)
-            const rows = text.split('\n').map(row => row.split(','));
+            // [수정] CSV 파싱 로직 업그레이드 (쉼표, 따옴표, 텍스트 처리 강화)
+            const rows = text.split('\n');
             
-            rows.forEach(([key, value]) => {
-                if (!key || !value) return;
-                const cleanKey = key.trim();
-                const num = parseInt(value.replace(/[^0-9]/g, '')); // 숫자만 추출
+            rows.forEach(row => {
+                // 정규식으로 CSV 파싱 (따옴표 안의 쉼표는 유지하고, 컬럼만 나눔)
+                const parts = row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                if (parts.length < 2) return;
+
+                const cleanKey = parts[0].trim().replace(/^"|"$/g, '');   // A열: 키
+                let cleanVal = parts[1].trim().replace(/^"|"$/g, '').replace(/""/g, '"'); // B열: 값
                 
+                // 페이지 단가 처리 (PAGE_UNIT_STANDARD 등)
                 if (cleanKey.startsWith('PAGE_UNIT_')) {
                     const type = cleanKey.replace('PAGE_UNIT_', '');
-                    if (PRICES.PAGE_UNIT[type] !== undefined) PRICES.PAGE_UNIT[type] = num;
+                    const num = parseInt(cleanVal.replace(/[^0-9]/g, ''));
+                    if (!isNaN(num) && PRICES.PAGE_UNIT[type] !== undefined) PRICES.PAGE_UNIT[type] = num;
                 } else if (PRICES[cleanKey] !== undefined) {
-                    PRICES[cleanKey] = num;
+                    // 기존 값이 숫자면 숫자로 변환, 아니면 문자로 저장
+                    if (typeof PRICES[cleanKey] === 'number') {
+                        const num = parseInt(cleanVal.replace(/[^0-9]/g, ''));
+                        if (!isNaN(num)) PRICES[cleanKey] = num;
+                    } else {
+                        PRICES[cleanKey] = cleanVal;
+                    }
                 }
             });
             console.log("✅ 구글 시트 가격표 적용 완료");
+            
+            // [추가] 화면의 텍스트도 엑셀 내용으로 업데이트
+            updateUITexts();
             calculateTotal(); // 가격 갱신 후 재계산
         } catch (e) {
             console.log("⚠️ 구글 시트 로딩 실패 (기본값 사용):", e);
         }
+    }
+
+    // [새 기능] 화면의 옵션 이름과 설명을 엑셀 데이터로 변경
+    function updateUITexts() {
+        // 심화 교정
+        document.getElementById('txtOptDeep').innerText = `${PRICES.OPT_DEEP_NAME} (페이지당 +${PRICES.DEEP_EDIT_UNIT.toLocaleString()}원)`;
+        document.getElementById('descOptDeep').innerText = PRICES.OPT_DEEP_DESC;
+        
+        // 표지 디자인
+        document.getElementById('txtOptCover').innerText = `${PRICES.OPT_COVER_NAME} (+${PRICES.COVER_PRICE.toLocaleString()}원)`;
+        document.getElementById('descOptCover').innerText = PRICES.OPT_COVER_DESC;
+        
+        // 급행 작업
+        document.getElementById('txtOptFast').innerText = `${PRICES.OPT_FAST_NAME} (비용 1.5배)`;
+        
+        // PDF 변환
+        document.getElementById('txtOptSource').innerText = `${PRICES.OPT_SOURCE_NAME} (+${PRICES.PDF_PRICE.toLocaleString()}원)`;
+        document.getElementById('descOptSource').innerText = PRICES.OPT_SOURCE_DESC;
     }
 
     // 🎨 [스타일별 추천 컬러 팔레트]
@@ -723,23 +804,34 @@
             // 가격 관련 필드만 0으로 리셋
             document.getElementById('basePriceDisplay').innerText = '0원';
             document.getElementById('pagePriceDisplay').innerText = '0원';
+            document.getElementById('pagePriceDisplay').style.color = '#333';
             document.getElementById('deepEditPriceDisplay').innerText = '0원';
             document.getElementById('coverPriceDisplay').innerText = '0원';
             document.getElementById('optionPriceDisplay').innerText = '0원';
             document.getElementById('expressRow').style.display = 'none';
             document.getElementById('totalPrice').innerText = '0원';
+            document.getElementById('durationDisplay').innerText = '약 0일';
 
             // 페이지 계산은 계속 수행
             const pages = parseInt(document.getElementById('pageCount').value) || 0;
-            const extraPages = Math.max(0, pages - 50);
-            document.getElementById('extraPageDisplay').innerText = extraPages;
+            const calcPages = (pages < 10) ? 10 : pages; // 최소 10페이지로 계산 고정
+            const diffPages = calcPages - 50;
 
             const msgBox = document.getElementById('pageMsg');
-            if (pages <= 50) {
-                msgBox.innerHTML = "<span style='color:#28a745;'>✅ 기본 제공 범위 내입니다. (추가금 없음)</span>";
+            if (pages < 10) {
+                msgBox.innerHTML = `<span style='color:#d32f2f;'>⚠️ 전자책 제작 최소 분량은 10페이지 이상을 권장합니다.</span>`;
+            } else if (diffPages > 0) {
+                msgBox.innerHTML = `<span style='color:#d32f2f;'>⚠️ 기본 50p 초과! (${diffPages}장 추가)</span>`;
+            } else if (diffPages < 0) {
+                msgBox.innerHTML = `<span style='color:#1565c0;'>📉 기본 50p 미만! (${Math.abs(diffPages)}장 할인 대상)</span>`;
             } else {
-                msgBox.innerHTML = `<span style='color:#d32f2f;'>⚠️ 기본 50p 초과! (${extraPages}장 추가)</span>`;
+                msgBox.innerHTML = "<span style='color:#28a745;'>✅ 기본 제공 범위 내입니다.</span>";
             }
+            
+            // 라벨 초기화
+            const quoteRowLabel = document.getElementById('pagePriceDisplay').previousElementSibling;
+            quoteRowLabel.innerText = "페이지 조정 (기본 50p 기준)";
+
             return 0;
         }
 
@@ -764,20 +856,48 @@
         // 1. 기본금
         let base = PRICES[level];
         
-        // 2. 페이지 추가금 (등급별 단가 적용)
+        // 2. 페이지 추가/할인 계산 (등급별 단가 적용)
         let unitPrice = PRICES.PAGE_UNIT[level];
-        let extraPages = Math.max(0, pages - 50);
-        let pageCost = extraPages * unitPrice;
+        let calcPages = (pages < 10) ? 10 : pages; // 최소 10페이지로 계산 고정
+        let diffPages = calcPages - 50;
+        let pageCost = diffPages * unitPrice;
 
-        // 안내 문구 업데이트 (등급별 단가 표시)
-        document.getElementById('pageHelpText').innerText = `* A4 원고 기준 (기본 50p, 대략 75,000자 분량 제공 / ${level} 등급 초과분 장당 ${unitPrice.toLocaleString()}원)`;
+        // 안내 문구 업데이트
+        document.getElementById('pageHelpText').innerText = `* A4 원고 기준 (기본 50p, 대략 75,000자 분량 제공 / ${level} 등급 증감 장당 ${unitPrice.toLocaleString()}원)`;
 
-        // 페이지 수 안내 메시지 표시
+        // 페이지 수 안내 메시지 & 견적서 라벨 표시
         const msgBox = document.getElementById('pageMsg');
-        if (pages <= 50) {
-            msgBox.innerHTML = "<span style='color:#28a745;'>✅ 기본 제공 범위 내입니다. (추가금 없음)</span>";
+        const quoteRowLabel = document.getElementById('pagePriceDisplay').previousElementSibling;
+        const quotePriceDisplay = document.getElementById('pagePriceDisplay');
+
+        if (diffPages > 0) {
+            // 추가금
+            msgBox.innerHTML = `<span style='color:#d32f2f;'>⚠️ 기본 50p 초과! (+${diffPages}장 x ${unitPrice.toLocaleString()}원)</span>`;
+            quoteRowLabel.innerText = `페이지 추가금 (기본 50p 초과 ${diffPages}p)`;
+            quotePriceDisplay.style.color = '#d32f2f';
+            quotePriceDisplay.innerText = '+' + pageCost.toLocaleString() + '원';
+        } else if (diffPages < 0) {
+            // 할인
+            let discountPages = Math.abs(diffPages);
+            let discountAmount = Math.abs(pageCost);
+            
+            // [수정] 계산 메시지 우선 표시 (경고는 뒤에 덧붙임)
+            let msgHtml = `<span style='color:#1565c0; font-weight:700;'>📉 기본 50p 미만! (-${discountPages}장 x ${unitPrice.toLocaleString()}원 할인)</span>`;
+            
+            if (pages < 10) {
+                msgHtml += ` <span style='color:#d32f2f; font-size:13px;'>(⚠️ 최소 10p 권장)</span>`;
+            }
+            msgBox.innerHTML = msgHtml;
+            
+            quoteRowLabel.innerText = `페이지 할인 (기본 50p 미만 ${discountPages}p)`;
+            quotePriceDisplay.style.color = '#1565c0';
+            quotePriceDisplay.innerText = '-' + discountAmount.toLocaleString() + '원';
         } else {
-            msgBox.innerHTML = `<span style='color:#d32f2f;'>⚠️ 기본 50p 초과! (${extraPages}장 x ${unitPrice.toLocaleString()}원 추가됨)</span>`;
+            // 변동 없음
+            msgBox.innerHTML = "<span style='color:#28a745;'>✅ 기본 제공 범위 내입니다. (변동 없음)</span>";
+            quoteRowLabel.innerText = `페이지 조정 (기본 50p 기준)`;
+            quotePriceDisplay.style.color = '#333';
+            quotePriceDisplay.innerText = '0원';
         }
 
         // 3. 교정 옵션 비용
@@ -799,8 +919,6 @@
 
         // 화면 표시
         document.getElementById('basePriceDisplay').innerText = base.toLocaleString() + '원';
-        document.getElementById('extraPageDisplay').innerText = extraPages;
-        document.getElementById('pagePriceDisplay').innerText = pageCost.toLocaleString() + '원';
         document.getElementById('deepEditPriceDisplay').innerText = deepEditCost.toLocaleString() + '원';
         document.getElementById('coverPriceDisplay').innerText = coverCost.toLocaleString() + '원';
         
@@ -819,8 +937,18 @@
         document.getElementById('totalPrice').innerText = finalTotal.toLocaleString() + '원';
 
         // 📅 [기간 계산 로직]
-        // 1. 기본 제작 기간 (기본 3일 + 25페이지당 1일) -> 조금 더 넉넉하게 수정
-        let days = 3 + Math.ceil(pages / 25);
+        // 1. 기본 제작 기간 (등급별 기본일 + 50페이지 초과 시 25페이지당 1일 추가)
+        let baseDays = 3; // STANDARD
+        if (level === 'DELUXE') baseDays = 5;
+        if (level === 'PREMIUM') baseDays = 7;
+        
+        // 기본 50페이지까지는 추가 기간 없음. 초과분에 대해서만 계산.
+        let extraDays = 0;
+        if (pages > 50) {
+            extraDays = Math.ceil((pages - 50) / 25);
+        }
+        
+        let days = baseDays + extraDays;
         
         // 2. 심화 교정: 20페이지당 1일 추가 (수십 번 반복 검수 필요)
         if (isDeepEdit) days += Math.ceil(pages / 20);
@@ -868,7 +996,7 @@
         
         const opts = [];
         if(document.getElementById('optDeepEdit').checked) opts.push("✍️ 심화 교정 추가");
-        if(document.getElementById('optCover').checked) opts.push("🎨 표지 디자인 추가");
+        if(document.getElementById('optCover').checked) opts.push("🎨 표지 디자인 [심플형] 추가");
         if(document.getElementById('optFast').checked) opts.push("🚀 급행 작업");
         if(document.getElementById('optSource').checked) opts.push("📄 PDF 변환 추가");
         const optText = opts.length > 0 ? opts.join(', ') : '없음';
@@ -927,6 +1055,20 @@
         });
     }
     
+    // [UI 개선] 드롭다운 선택 시 색상 변경 기능
+    function initSelectHighlight() {
+        const selects = document.querySelectorAll('.form-select');
+        selects.forEach(select => {
+            // 초기 상태 확인 (이미 선택된 값이 있으면 강조)
+            if (select.value) select.classList.add('is-selected');
+
+            select.addEventListener('change', function() {
+                if (this.value) this.classList.add('is-selected');
+                else this.classList.remove('is-selected');
+            });
+        });
+    }
+
     // 초기화
     window.addEventListener('load', () => {
         const activeBtn = document.querySelector('.tab-btn.active');
@@ -935,6 +1077,7 @@
         showProofreadingInfo(); // 초기 상태 반영
         loadPricesFromSheet();  // 구글 시트 가격 불러오기
         calculateTotal();
+        initSelectHighlight(); // 드롭다운 하이라이트 기능 활성화
     });
 
     // 창 크기 변경 시 라인 위치 재조정
