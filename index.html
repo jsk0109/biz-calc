@@ -6,11 +6,11 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>출판엔지니어의 EPUB 제작 의뢰 및 자동견적서</title>
+    <title>출판엔지니어의 EPUB 표준 전자책/제작 의뢰 및 자동견적서</title>
     <link rel="stylesheet" as="style" crossorigin="anonymous" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
     <style>
         :root {
-            --primary-color: #1a237e;
+            --primary-color: #1a237e; /* [수정] 전체 테마 색상을 보라색에서 진한 남색으로 변경 */
             --bg-color: #f0f2f5;
             --container-bg: #ffffff;
             --text-main: #1a1a1a;
@@ -20,8 +20,8 @@
         }
         body {
             font-family: "Pretendard", sans-serif;
-            background-color: var(--bg-color);
             color: var(--text-main);
+            background: linear-gradient(120deg, #f0ecfc 0%, #e3f2fd 100%); /* [Glassmorphism] 효과를 위해 그라데이션 배경 적용 */
             margin: 0;
             padding: 40px 20px;
             display: flex;
@@ -31,9 +31,13 @@
         .container {
             width: 100%;
             max-width: 720px;
-            background: var(--container-bg);
+            /* [Glassmorphism] 전체 적용: 배경을 반투명하게 변경 */
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -42,7 +46,7 @@
         
         /* Header */
         header {
-            background: var(--primary-color);
+            background: rgba(15, 3, 85, 0.9); /* 헤더도 살짝 투명하게 */
             padding: 30px;
             color: white;
             text-align: center;
@@ -53,11 +57,11 @@
         /* Tabs */
         .tab-nav { display: flex; border-bottom: 1px solid var(--border-color); position: relative; }
         .tab-btn {
-            flex: 1; padding: 15px; border: none; background: #fff;
+            flex: 1; padding: 15px; border: none; background: transparent; /* 배경 투명하게 */
             font-size: 16px; font-weight: 800; color: #333;
             cursor: pointer; transition: color 0.5s;
         }
-        .tab-btn.active { color: var(--primary-color); background: #f8f9fa; }
+        .tab-btn.active { color: var(--primary-color); background: rgba(255, 255, 255, 0.5); }
         
         /* Sliding Tab Line */
         .tab-line {
@@ -99,8 +103,15 @@
         
         /* Quote Section */
         .quote-box {
-            background: #fafafa; border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 40px; margin-top: 60px;
+            /* [Glassmorphism] 스타일 적용 */
+            background: rgba(255, 255, 255, 0.3); /* 반투명도 조절 */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px); /* Safari 호환성 */
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+            padding: 40px; 
+            margin-top: 60px;
         }
         .quote-row {
             display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 16px;
@@ -181,7 +192,7 @@
         .divider-line { width: 30px; height: 3px; margin: 0 auto 20px; border-radius: 2px; }
         .point-icon { font-size: 20px; margin-bottom: 15px; }
         .quote-text { font-size: 16px; font-style: italic; margin-bottom: 20px; font-weight: 500; }
-        .body-text { font-size: 15px; line-height: 1.7; color: #333; text-align: justify; max-width: 100%; }
+        .body-text { font-size: 15px; line-height: 1.7; color: #141313; text-align: justify; max-width: 100%; }
 
         /* Bookstore Buttons */
         .store-links { margin-bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -235,7 +246,7 @@
 
 <div class="container">
     <header>
-        <h1>📚 출판엔지니어의 EPUB 제작 의뢰 및 자동견적서</h1>
+        <h1>📚 출판엔지니어의 EPUB 표준 전자책<br>제작 의뢰 및 자동견적서</h1>
         <p>원고 상태와 제작 유형을 선택하면 견적이 계산됩니다.</p>
     </header>
 
@@ -288,6 +299,11 @@
             </div>
         </div>
 
+        <div class="form-group">
+            <label class="form-label">Q. 작가님의 성함이나 '필명'을 입력해주세요 (선택사항)</label>
+            <input type="text" id="authorName" name="author_name" class="form-input" placeholder="예: 홍길동">
+        </div>
+
         <div class="btn-area">
             <button type="button" class="btn-next" onclick="openTab('tab2')">다음: 디자인 선택 👉</button>
         </div>
@@ -321,7 +337,7 @@
             <div class="picker-item">
                 <div class="picker-info">
                     <span class="picker-label">2순위 (Sub)</span>
-                    <span class="picker-desc">아이콘 / 구분선 (포인트)</span>
+                    <span class="picker-desc">아이콘/장식 (보조 색상)</span>
                 </div>
                 <div style="text-align:center;">
                     <input type="color" id="subColor" name="sub_color" value="#adb5bd" oninput="updatePreview()">
@@ -331,7 +347,7 @@
             <div class="picker-item">
                 <div class="picker-info">
                     <span class="picker-label">3순위 (Accent)</span>
-                    <span class="picker-desc">소제목 / 챕터번호 (보조)</span>
+                    <span class="picker-desc">명언구 (선택 사항)</span>
                 </div>
                 <div style="text-align:center;">
                     <input type="color" id="accentColor" name="accent_color" value="#495057" oninput="updatePreview()">
@@ -339,22 +355,7 @@
                 </div>
             </div>
 
-            <div class="form-group" style="margin-top: 30px; border-bottom: none; padding-bottom: 0;">
-                <label class="form-label">Q. 원고를 직접 넣어보시겠어요? (체험하기)</label>
-                <p style="font-size:14px; color:#555; margin-bottom:10px; line-height:1.5;">여기에 원고의 한 챕터를 붙여넣으세요.<br><strong>첫 줄은 제목</strong>, <strong>숫자나 기호로 시작하는 줄(소제목)</strong>은 보조 컬러로 디자인됩니다.</p>
-                <textarea id="customText" class="form-textarea" style="height:150px;" placeholder="예시)&#10;제1장. 시작이 반이다&#10;&#10;1. 작은 습관의 힘 (소제목)&#10;많은 사람들이 거창한 목표를 세우지만 작심삼일로 끝납니다.&#10;&#10;2. 꾸준함이 답이다 (소제목)&#10;천 리 길도 한 걸음부터라는 말이 있습니다. 지금 바로 시작하세요." oninput="updatePreview()"></textarea>
-            </div>
-
-            <!-- [UI 개선] 미리보기 상단에 퀵 컬러 피커 배치 (모바일 스크롤 불편 해소) -->
-            <div style="display:flex; justify-content:space-between; align-items:end; margin-top: 50px; margin-bottom: 10px;">
-                <p style="font-weight: 700; font-size: 14px; color:#4e342e; margin:0;">👀 미리보기 (Preview)</p>
-                <div style="display:flex; align-items:center; gap:8px; background:#fff; padding:6px 12px; border:1px solid #ddd; border-radius:20px; box-shadow:0 2px 5px rgba(0,0,0,0.05);">
-                    <span style="font-size:12px; font-weight:700; color:#555;">🎨 색상변경</span>
-                    <input type="color" id="quickMain" value="#212529" oninput="syncColors('main', this.value)" style="width:24px; height:24px; border:none; padding:0; background:none; cursor:pointer;" title="Main Color">
-                    <input type="color" id="quickSub" value="#adb5bd" oninput="syncColors('sub', this.value)" style="width:24px; height:24px; border:none; padding:0; background:none; cursor:pointer;" title="Sub Color">
-                    <input type="color" id="quickAccent" value="#495057" oninput="syncColors('accent', this.value)" style="width:24px; height:24px; border:none; padding:0; background:none; cursor:pointer;" title="Accent Color">
-                </div>
-            </div>
+            <p style="margin-top: 50px; margin-bottom: 10px; font-weight: 700; font-size: 14px; color:#4e342e;">👀 미리보기 (Preview)</p>
             <div class="preview-box" id="previewBox" style="margin-top: 0; margin-bottom: 0;">
             <div class="chapter-num" id="prevNum">CHAPTER 01</div>
             <h2 class="chapter-title" id="prevTitle">성공하는 사람들의<br>아주 작은 습관</h2>
@@ -390,9 +391,9 @@
         <div class="form-group">
             <label class="form-label">Q. 원하시는 제작 등급을 선택해주세요</label>
             <p style="font-size:14px; color:#555; margin-bottom:15px; line-height:1.5;">
-                <strong>∙ STANDARD:</strong> 텍스트 위주, 가독성 최적화, 무결점 VSC코딩<br>
-                <strong>∙ DELUXE:</strong> 이미지/박스, 팝업/인라인 각주(무제한), 정보 구조화<br>
-                <strong>∙ PREMIUM:</strong> CSS 고급 편집, 종이책 감성, 소장 가치
+                <strong>∙ STANDARD:</strong> 텍스트 위주, 가독성 최적화<br>
+                <strong>∙ DELUXE:</strong> 이미지/박스, 팝업/인라인 각주, 정보 구조화<br>
+                <strong>∙ PREMIUM:</strong> 고급 편집, 종이책 감성, 소장 가치
             </p>
             <select id="serviceLevel" name="service_level" class="form-select" onchange="calculateTotal()" autocomplete="off">
                 <option value="" selected disabled hidden>선택해주세요</option>
@@ -461,15 +462,16 @@
                 <label class="checkbox-card">
                     <div class="checkbox-row">
                         <input type="checkbox" id="optOriginal" name="opt_original" value="Yes" onchange="calculateTotal()">
-                        <span id="txtOptOriginal">💾 원본 소스(HTML/CSS) 영구 소장 (+50,000원)</span>
+                        <span id="txtOptOriginal">💾 원본 소스(HTML/CSS) 영구 소장 (+100,000원)</span>
                     </div>
-                    <span class="checkbox-desc" id="descOptOriginal">작업자 부재 시 타 전문가가 수정할 수 있는 '마스터 파일' 제공 (보험용)</span>
+                    <span class="checkbox-desc" id="descOptOriginal">재고 걱정 없이 평생 팔리는 전자책. 개정판, 증보판 등 재발행을 위한 마스터파일 제공.</span>
                 </label>
                 <label class="checkbox-card">
                     <div class="checkbox-row">
                         <input type="checkbox" id="optFast" name="opt_fast" value="Yes" onchange="calculateTotal()">
                         <span id="txtOptFast">🚀 급행 작업 (비용 1.5배)</span>
                     </div>
+                    <span class="checkbox-desc" id="descOptFast">다른 일정보다 최우선 순위로 배정하여 가장 빠르게 작업합니다. (야간/주말 포함)</span>
                 </label>
             </div>
         </div>
@@ -524,7 +526,7 @@
                 <span id="optionPriceDisplay">0원</span>
             </div>
             <div class="quote-row">
-                <span>원본 소스 (마스터 파일)</span>
+                <span>원본 소스 제공</span>
                 <span id="originalPriceDisplay">0원</span>
             </div>
             <div class="quote-row" id="expressRow" style="display:none; color:#d32f2f; font-weight:700;">
@@ -585,6 +587,7 @@
         DEEP_EDIT_UNIT: 9000,// 심화 교정 비용 (페이지당)
         COVER_PRICE: 80000,// 표지 디자인 비용
         PDF_PRICE: 50000,  // PDF 변환 비용
+        ORIGINAL_PRICE: 100000, // 원본 소스 제공 비용
 
         // 📝 [텍스트 설정] 엑셀에서 문구도 수정 가능하게 추가
         OPT_DEEP_NAME: "✍️ 심화 교정 (문장 다듬기)",
@@ -592,17 +595,18 @@
         OPT_COVER_NAME: "🎨 표지 디자인 [심플형] 추가",
         OPT_COVER_DESC: "상업용 폰트/이미지 활용 타이포그래피 작업",
         OPT_FAST_NAME: "🚀 급행 작업",
+        OPT_FAST_DESC: "다른 일정보다 최우선 순위로 배정하여 가장 빠르게 작업합니다. (야간/주말 포함)",
         OPT_SOURCE_NAME: "📄 소장용/인쇄용 PDF 변환",
         OPT_SOURCE_DESC: "편집/교정이 완료된 최종 원고를 가독성 좋게 변환 (저작권 걱정 없는 무료 폰트 사용)",
-        ORIGINAL_PRICE: 50000, // 원본 제공 비용 (3만 -> 5만 인상)
         OPT_ORIGINAL_NAME: "💾 원본 소스(HTML/CSS) 영구 소장",
-        OPT_ORIGINAL_DESC: "작업자 부재 시 타 전문가가 수정할 수 있는 '마스터 파일' 제공 (보험용)"
+        OPT_ORIGINAL_DESC: "재고 걱정 없이 평생 팔리는 전자책. 개정판, 증보판 등 재발행을 위한 마스터파일 제공."
     };
 
     // ☁️ [구글 스프레드시트 연동] 엑셀로 가격 관리하기
     // 사용법: 구글 시트에 가격표를 만들고 '웹에 게시(CSV)'한 링크를 아래에 넣으세요.
     // 링크가 비어있으면 위쪽 기본 설정(PRICES)을 사용합니다. (안 쓰시면 비워두세요)
-    const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIc2WJ5y72yLS9WzyIJzcLX-I02bRrO4IrCA-xM0n_jhGGolEA-6ubzoroB4YybiA1tkDksQxoxiIi/pub?gid=0&single=true&output=csv"; // "https://docs.google.com/spreadsheets/..." (연동 해제됨: 이제 위쪽 PRICES 설정이 적용됩니다)
+    // const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIc2WJ5y72yLS9WzyIJzcLX-I02bRrO4IrCA-xM0n_jhGGolEA-6ubzoroB4YybiA1tkDksQxoxiIi/pub?gid=0&single=true&output=csv"; 
+    const SHEET_URL = ""; // 👈 수정할 때는 이렇게 비워두세요 (로컬 모드)
 
     async function loadPricesFromSheet() {
         console.log("🔄 구글 시트 연동 시도 중..."); // [확인용] 함수가 실행되는지 체크
@@ -674,12 +678,13 @@
         
         // 급행 작업
         document.getElementById('txtOptFast').innerText = `${PRICES.OPT_FAST_NAME} (비용 1.5배)`;
+        document.getElementById('descOptFast').innerText = PRICES.OPT_FAST_DESC;
         
         // PDF 변환
         document.getElementById('txtOptSource').innerText = `${PRICES.OPT_SOURCE_NAME} (+${PRICES.PDF_PRICE.toLocaleString()}원)`;
         document.getElementById('descOptSource').innerText = PRICES.OPT_SOURCE_DESC;
 
-        // 원본 제공
+        // 원본 소스 제공
         document.getElementById('txtOptOriginal').innerText = `${PRICES.OPT_ORIGINAL_NAME} (+${PRICES.ORIGINAL_PRICE.toLocaleString()}원)`;
         document.getElementById('descOptOriginal').innerText = PRICES.OPT_ORIGINAL_DESC;
     }
@@ -817,81 +822,16 @@
         }
     }
 
-    // [추가] 퀵 피커와 메인 피커 양방향 동기화 함수
-    function syncColors(type, val) {
-        // 1. 원본(큰) 피커 값 변경
-        document.getElementById(type + 'Color').value = val;
-        // 2. 미리보기 갱신 (updatePreview 내부에서 퀵 피커도 같이 맞춰줌)
-        updatePreview();
-    }
-
     function updatePreview() {
         const main = document.getElementById('mainColor').value;
         const sub = document.getElementById('subColor').value;
         const accent = document.getElementById('accentColor').value;
 
-        // Elements
-        const numEl = document.getElementById('prevNum');
-        const titleEl = document.getElementById('prevTitle');
-        const lineEl = document.getElementById('prevLine');
-        const iconEl = document.getElementById('prevIcon');
-        const quoteEl = document.getElementById('prevQuote');
-        const bodyEl = document.querySelector('.preview-box .body-text');
-
-        // Apply Colors
-        numEl.style.color = accent;
-        titleEl.style.color = main;
-        lineEl.style.backgroundColor = sub;
-        iconEl.style.color = sub;
-        quoteEl.style.color = sub;
-
-        // Custom Text Logic
-        const rawText = document.getElementById('customText').value.trim();
-
-        if (rawText) {
-            const lines = rawText.split('\n').filter(line => line.trim() !== '');
-            
-            // 1. Title (First Line)
-            if (lines.length > 0) titleEl.innerText = lines[0];
-
-            // 2. Body & Quotes (Rest)
-            if (lines.length > 1) {
-                let htmlContent = '';
-                
-                // 두 번째 줄부터 한 줄씩 검사
-                for (let i = 1; i < lines.length; i++) {
-                    let line = lines[i].trim();
-                    
-                    // [소제목 감지 로직] 수정: 시(Poem) 오인 방지 (길이 체크 삭제, 명확한 기호만 인정)
-                    const isSubheading = /^(#|■|□|◈|◇|●|○|Chapter|Part|Section|Prologue|Epilogue|\d+\.|\[|<)/i.test(line);
-
-                    if (isSubheading) {
-                        htmlContent += `<h3 style="color:${accent}; font-size:17px; margin:25px 0 10px 0; font-weight:700; line-height:1.4;">${line}</h3>`;
-                    } else {
-                        // [수정] 본문: 따옴표 로직 제거, 단순 출력
-                        htmlContent += `<p style="margin-bottom:15px;">${line}</p>`;
-                    }
-                }
-                bodyEl.innerHTML = htmlContent;
-                
-                quoteEl.style.display = 'none';
-                iconEl.style.display = 'none';
-            }
-        } else {
-            // Default Mode
-            titleEl.innerHTML = "성공하는 사람들의<br>아주 작은 습관";
-            quoteEl.style.display = 'block';
-            iconEl.style.display = 'block';
-            quoteEl.innerText = '"습관은 복리로 작용한다."';
-            bodyEl.innerText = "우리는 흔히 거창한 목표만이 인생을 바꾼다고 생각합니다. 하지만 실제로 삶을 변화시키는 것은 매일 반복되는 사소한 행동들입니다.";
-        }
-
-        // [추가] 퀵 피커 값 동기화 (스타일 변경이나 상단 피커 조작 시 하단 퀵 피커도 같이 변경)
-        if(document.getElementById('quickMain')) {
-            document.getElementById('quickMain').value = main;
-            document.getElementById('quickSub').value = sub;
-            document.getElementById('quickAccent').value = accent;
-        }
+        document.getElementById('prevNum').style.color = main;
+        document.getElementById('prevTitle').style.color = main;
+        document.getElementById('prevLine').style.backgroundColor = sub;
+        document.getElementById('prevIcon').style.color = sub;
+        document.getElementById('prevQuote').style.color = accent;
     }
 
     function calculateTotal() {
@@ -906,8 +846,8 @@
             document.getElementById('deepEditPriceDisplay').innerText = '0원';
             document.getElementById('coverPriceDisplay').innerText = '0원';
             document.getElementById('optionPriceDisplay').innerText = '0원';
-            document.getElementById('originalPriceDisplay').innerText = '0원';
             document.getElementById('expressRow').style.display = 'none';
+            document.getElementById('originalPriceDisplay').innerText = '0원';
             document.getElementById('totalPrice').innerText = '0원';
             document.getElementById('durationDisplay').innerText = '약 0일';
 
@@ -1008,9 +948,11 @@
 
         // 5. 기타 옵션 비용
         let pdfCost = isSource ? PRICES.PDF_PRICE : 0;
+
+        // 6. 원본 소스 비용
         let originalCost = isOriginal ? PRICES.ORIGINAL_PRICE : 0;
 
-        // 6. 합계 및 급행 할증 계산
+        // 7. 합계 및 급행 할증 계산
         let preTotal = base + pageCost + deepEditCost + coverCost + pdfCost + originalCost;
         let expressFee = 0;
         if (isFast) {
@@ -1025,6 +967,8 @@
         
         // PDF 옵션 표시
         document.getElementById('optionPriceDisplay').innerText = pdfCost.toLocaleString() + '원';
+
+        // 원본 소스 표시
         document.getElementById('originalPriceDisplay').innerText = originalCost.toLocaleString() + '원';
         
         // 급행료 별도 표시
@@ -1082,6 +1026,7 @@
         const scriptURL = "https://script.google.com/macros/s/AKfycbxB5_YsvzS5pxKVoDEmSQ2VBx1oyJzrXGWnn0hmm14XX6y41DkvKVVEMRfdvzMt_cJ4jQ/exec"; 
 
         const title = document.getElementById('title').value || '(미입력)';
+        const authorName = document.getElementById('authorName').value || '(미입력)';
         const category = document.getElementById('category').value || '(미선택)';
         const manuscriptType = document.getElementById('manuscriptType').value || '(미선택)';
         const status = document.getElementById('status').value || '(미선택)';
@@ -1100,7 +1045,7 @@
         if(document.getElementById('optDeepEdit').checked) opts.push("✍️ 심화 교정 추가");
         if(document.getElementById('optCover').checked) opts.push("🎨 표지 디자인 [심플형] 추가");
         if(document.getElementById('optSource').checked) opts.push("📄 PDF 변환 추가");
-        if(document.getElementById('optOriginal').checked) opts.push("💾 원본 소스(마스터 파일) 제공");
+        if(document.getElementById('optOriginal').checked) opts.push("💾 원본 소스 제공");
         if(document.getElementById('optFast').checked) opts.push("🚀 급행 작업");
         const optText = opts.length > 0 ? opts.join(', ') : '없음';
 
@@ -1108,6 +1053,7 @@
 
 1️⃣ 책 정보
 - 제목: ${title}
+- 저자명: ${authorName}
 - 카테고리: ${category}
 - 원고 종류: ${manuscriptType}
 - 상태: ${status}
@@ -1131,6 +1077,7 @@
         // 2. [시트로 보낼 데이터 정리]
         const params = new URLSearchParams();
         params.append('title', title);
+        params.append('authorName', authorName);
         params.append('category', category);
         params.append('manuscriptType', manuscriptType);
         params.append('status', status);
